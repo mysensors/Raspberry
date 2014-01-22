@@ -70,17 +70,12 @@ void Gateway::begin(uint8_t _radioId) {
 #endif
 
 	// Start up the radio library
-        fprintf(stderr,"Hej-begin-");
 	setupRadio();
-        fprintf(stderr,"After setupRadio-");
 	RF24::openReadingPipe(CURRENT_NODE_PIPE, BASE_RADIO_ID);
-        fprintf(stderr,"After openReadingPipe-"); 
 	RF24::startListening();
-        fprintf(stderr,"After startListening-");
 
 	// Send startup log message on serial
-	serial(PSTR("0;0;%d;%d;Arduino startup complete.\n"),  M_INTERNAL, I_LOG_MESSAGE);
-        fprintf(stderr,"After serial-");
+	debug(PSTR("0;0;%d;%d;Arduino startup complete.\n"),  M_INTERNAL, I_LOG_MESSAGE);
 
 }
 
@@ -219,6 +214,12 @@ void Gateway::serial(const char *fmt, ... ) {
    vsnprintf_P(serialBuffer, MAX_SEND_LENGTH, fmt, args);
    va_end (args);
    Serial.print(serialBuffer);
+#else
+ va_list args;
+   va_start (args, fmt );
+   vsnprintf(serialBuffer, MAX_SEND_LENGTH, fmt, args);
+   va_end (args);
+   writeJs(serialBuffer);
 #endif
 }
 

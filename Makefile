@@ -7,6 +7,7 @@
 # cd RF24
 # cd librf24-rpi/librf24
 # make
+# make PiGatewayPipe
 # sudo make install 
 #
 # The valiable RF24H below should point to the directory for the RF24 header
@@ -28,10 +29,11 @@ OBJS = ${PROGRAMS:=.o}
 DEPS = ${PROGRAMS:=.h}
 RF24H = /home/pi/RF24/librf24-rpi/librf24/
 
-all: ${GATEWAY} 
+all: ${OBJS} 
+
 
 %.o: %.cpp ${DEPS}
-	${CC} -c -o $@ $< ${CCFLAGS} -I${RF24H}
+	${CC} -c -g -o $@ $< ${CCFLAGS} -I${RF24H}
 
 ${GATEWAY}: ${OBJS}
 	${CC} -o $@ ${OBJS} ${CCFLAGS} -I${RF24H} -lrf24

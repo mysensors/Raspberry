@@ -109,16 +109,16 @@ enum {
 
 // The message structure
 typedef struct {
-  uint8_t crc       	 	 : 8;    // 8 bits crc
-  uint8_t version       	 : 3;    // 3 bits protocol version
-  uint8_t binary			 : 1; 	 // 1 bit. Data is binary and should be encoded when sent to sensor net gateway
-  uint8_t from				 : 8;	 // 8 bits. RadioId of sender node
-  uint8_t to      	         : 8;    // 8 bits. RadioId of destination node
-  uint8_t last     	         : 8;    // 8 bits. RadioId of last node this message passed
-  uint8_t childId            : 8;	 // 1 byte. Up to MAX_CHILD_DEVICES child sensors per radioId
-  uint8_t messageType        : 4;    // 4 bits. Type of message. See messageType
+  uint8_t crc;// 8 bits crc
+  uint8_t version;    // (3 bits) protocol version
+  uint8_t binary; 	 // (1 bit). Data is binary and should be encoded when sent to sensor net gateway
+  uint8_t from;	 // 8 bits. RadioId of sender node
+  uint8_t to;    // 8 bits. RadioId of destination node
+  uint8_t last;    // 8 bits. RadioId of last node this message passed
+  uint8_t childId;	 // 1 byte. Up to MAX_CHILD_DEVICES child sensors per radioId
+  uint8_t messageType;    // (4 bits). Type of message. See messageType
 
-  uint8_t type               : 8;	 // 8 bits. variableType or deviceType depending on messageType
+  uint8_t type;	 // 8 bits. variableType or deviceType depending on messageType
 } header_s;
 
 typedef struct {
