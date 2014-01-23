@@ -1,11 +1,7 @@
 #############################################################################
 #
-# Compiles Mysensors Gateway for Raspberry Pi. Uses the RF24 library
-# Install the RF24 library by source:
+# Compiles Mysensors Gateway for Raspberry Pi. 
 #
-# git clone https://github.com/stanleyseow/RF24.git
-# cd RF24
-# cd librf24-rpi/librf24
 # make
 # make PiGatewayPipe
 # sudo make install 
@@ -27,17 +23,18 @@ GATEWAY  = PiGateway
 SOURCES = ${PROGRAMS:=.cpp}
 OBJS = ${PROGRAMS:=.o}
 DEPS = ${PROGRAMS:=.h}
-RF24H = /home/pi/RF24/librf24-rpi/librf24/
+RF24H=librf24
 
 all: ${OBJS} 
-
 
 %.o: %.cpp ${DEPS}
 	${CC} -c -g -o $@ $< ${CCFLAGS} -I${RF24H}
 
-${GATEWAY}: ${OBJS}
-	${CC} -o $@ ${OBJS} ${CCFLAGS} -I${RF24H} -lrf24
+${GATEWAY}: RF24 ${OBJS}
+	${CC} -o $@ ${OBJS} ${CCFLAGS} -I${RF24H} librf24/librf24.so.1
 
+RF24:	
+	$(MAKE) -C librf24
 clean:
 	rm -rf $(PROGRAMS)
 

@@ -1,3 +1,16 @@
+/*
+ * Communicates via RF24. Retrieves and send data from/to the sensor radios.
+ * Writes/Reads commands to/from the file sockets /tmp/testc.sock resp. 
+ * /tmp/testjs.sock 
+ * The commands are of the form:
+ *
+ * radioId;childId;msgTypeId;sensorTypeId;sensorValue
+ *
+ * Note: This programs need to be dynamically linked with librf24/librf24.so.1
+ *
+ * Author: Johan Ekblad 2014
+ * License: GNU Public License Version 2
+ */
 #include <stdio.h>
 #include "Gateway.h"
 #include <unistd.h>
