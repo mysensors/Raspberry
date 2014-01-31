@@ -5,8 +5,9 @@ function define(name, value) {
     });
 }
 
-define("SENSOR_PRESENTATION",0);
+define("PRESENTATION",0);
 define("SET_VARIABLE",1);
-define("REQUEST_STATUS",2);
-define("MESSAGE",99);
+define("REQ_VARIABLE",2);
+define("ACK_VARIABLE",3);
+define("INTERNAL",4);
 
