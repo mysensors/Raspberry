@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var net = require('net');
+var client = new net.Socket();
 var fs = require('fs');
 var http = require('http');
 var querystring = require('querystring');
@@ -8,7 +9,6 @@ var devices = require("./dbDetails").collection('devices');
 var devicesSkynet = require("./dbDetails").collection('devicesSkynet');
 var radioIds = require("./dbDetails").collection('radioIds');
 var user = require("./user");
-var writesocket;
 
 
 var msgType = {PRESENTATION:0,
@@ -31,14 +31,6 @@ var intType = {BATTERY_LEVEL:0,
                CHILDREN:12,
                UNIT:13};
 
-var server = net.createServer(function(stream) {
-  stream.on('data', function(c) {
-    processIncoming(c.toString());
-  });
-  stream.on('end', function() {
-    server.close();
-  });
-});
 
 function processIncoming(s)
 {
@@ -156,7 +148,14 @@ function sendCommandWithMessageType(radioId,childId,msgTypeId1,msgTypeId2,data)
     dataToSend=radioId+";"+childId+";"+msgTypeId1+";"+msgTypeId2+";"+data;
 
     console.log("Sending data "+dataToSend);
-    writesocket.write(dataToSend);
+    if (client !== undefined)
+    {
+        client.write(dataToSend+"\n");
+    }
+    else
+    {
+        console.log("Write socket not ready yet");
+    }
 }
 
 function skynetPOST(id,dataJSON)
@@ -275,18 +274,22 @@ function updateDevice(id,dataJSON,uuid,token)
     skynetPUTJSON={sensorValue:dataJSON.sensorValue,timestamp:dataJSON.timestamp};
     skynetPUT(id, skynetPUTJSON, dataJSON, uuid, token);
 }
+console.log("Processing messages...");
 
-function main() {
-    writesocket = net.connect('/tmp/testc.sock');
-    writesocket.write('0;0;4;4;Get Version');
+client.on('data', function(c) {
+    processIncoming(c.toString());
+    //console.log("Skipping "+c.toString());
+  });
+client.on('close', function() {
+    console.log("Got Close!");
+  });
+client.on('error', function() {
+    console.log("Got Error!");
+  });
+
+client.connect(1315,'localhost', function() {
+    console.log("Connected to server");
+    client.write("0;0;4;4;Get Version");
     console.log("Sent Version");
-}
+});
 
-if (fs.existsSync('/tmp/testjs.sock'))
-{
-    fs.unlinkSync('/tmp/testjs.sock');
-}
-server.listen('/tmp/testjs.sock');
-
-var stream = net.connect('/tmp/testjs.sock');
-setTimeout(main,5000);
