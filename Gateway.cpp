@@ -148,7 +148,7 @@ void Gateway::parseAndSend(String inputString) {
 	  }
 	  i++;
   }
-
+  debug(PSTR("INGOT radioId=%d, childId=%d, messageType=%d, type=%d, value=%s"), sensorRadioId, childId, messageType, type, value);
   if (sensorRadioId==GATEWAY_ADDRESS && messageType==M_INTERNAL) {
     // Handle messages directed to gateway
     if (type == I_VERSION) {
@@ -160,6 +160,7 @@ void Gateway::parseAndSend(String inputString) {
     }
   } else {
     txBlink(1);
+    debug("Sending data to GATEWAY");
     ok = sendData(GATEWAY_ADDRESS, sensorRadioId, childId, messageType, type, value, strlen(value), false);
     if (!ok) {
       errBlink(1);

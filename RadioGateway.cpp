@@ -1,23 +1,21 @@
 /*
  * Communicates via RF24. Retrieves and send data from/to the sensor radios.
- * Writes/Reads commands to/from the file sockets /tmp/testc.sock resp. 
- * /tmp/testjs.sock 
+ * Writes/Reads commands to/from a network socket (started by this server). 
+ * (Default port = 1315)
  * The commands are of the form:
  *
  * radioId;childId;msgTypeId;sensorTypeId;sensorValue
  *
  * Note: This programs need to be dynamically linked with librf24/librf24.so.1
  *
+ * Node2: First two times you run this program on a freshly booated RPi you 
+ *        will get SEGV (Segmentation Fault) in the row gw->begin(0) below
+ *        It works from the third time and forward. TODO FIX 2 TIMES SEGV
+ * 
  * Author: Johan Ekblad 2014
  * License: GNU Public License Version 2
  */
-#include <stdio.h>
-#include "Gateway.h"
-#include <unistd.h>
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+#include "RadioGateway.h"
 
 static int fdjs = 0;
 
@@ -27,7 +25,15 @@ void writeJs(char *message)
     memset(buf,200,0);
     strcpy(buf,message);
     buf[strlen(message)]='\0';
-    write(fdjs, buf, strlen(message));
+    printf("Writing back message");
+    if (fdjs != 0)
+    {
+      write(fdjs, buf, strlen(message));
+    }
+    else // No NodeServer.js connected, skip message
+    {
+      printf("Throttle message\n");
+    }
 }
 
 bool inputAvailable(int fd)  
@@ -47,81 +53,48 @@ bool inputAvailable(int fd)
   return r;
 }
 
-int openJSSocket()
-{
-    int fd;
-    char buf[200];
-    char *socket_path="/tmp/testjs.sock";
-    struct sockaddr_un addr;
- 
-    if ( (fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
-    perror("socket error");
-    exit(-1);
-  }
-
-  memset(&addr, 0, sizeof(addr));
-  addr.sun_family = AF_UNIX;
-  strncpy(addr.sun_path, socket_path, sizeof(addr.sun_path)-1);
-
-  if (connect(fd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
-    perror("connect error");
-    exit(-1);
-  }
-  printf("Opened %s\n",socket_path);
-
-  return fd; 
-
-}
-
 int listenCSocket()
 {
-    struct sockaddr_un addr;
+  struct sockaddr_in addr;
   int fd;
-  char *socket_path="/tmp/testc.sock";
 
-
-  if ( (fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
+  if ( (fd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
     perror("socket error");
     exit(-1);
   }
 
-  int flags = fcntl(fd, F_GETFL, 0);
-  fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+  int on=1;
+  setsockopt(fd, SOL_SOCKET,  SO_REUSEADDR,
+                   (char *)&on, sizeof(on));
+  
   memset(&addr, 0, sizeof(addr));
-  addr.sun_family = AF_UNIX;
-  strncpy(addr.sun_path, socket_path, sizeof(addr.sun_path)-1);
-
-  unlink(socket_path);
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(SERVERPORT);
+  addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
   if (bind(fd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
     perror("bind error");
     exit(-1);
   }
 
+  // Up to 5 clients
   if (listen(fd, 5) == -1) {
     perror("listen error");
     exit(-1);
   }
 
-  // Fix permission so that the node.js app can write to this socket
-  // TODO: set the same owner as for the node.js process instead
-  chmod (socket_path, 0777);
   return fd;
 
 }
 
 int main(int argc, const char* argv[])
 {
-    fdjs = openJSSocket(); 
-
     int fd = listenCSocket();
-    //char *test="Test\n"; 
-    //write(fd2,test,6);
-    writeJs("Test2\n");
+    
+    printf("Listening on 0.0.0.0:%d\n",SERVERPORT);
 
     printf("Starting Gateway...\n");
     Gateway *gw = new Gateway("/dev/spidev0.0",8000000,25,3000);
-    //Gateway *gw = new Gateway("/dev/spidev0.0",8000000,9,3000);
     printf("Gateway created...\n");
     if (gw == NULL)
     {
@@ -129,23 +102,34 @@ int main(int argc, const char* argv[])
     }
     gw->begin(0);
     printf("Begin called\n");
+
+    // Wait until we have input (client should first send a ping)
+    while (!inputAvailable(fd))
+    {
+        gw->processRadioMessage();
+    }
+    int cl;
+    if ( (cl = accept(fd, NULL, NULL)) == -1) {
+      perror("accept error");
+    }
+    fdjs = cl;
+
     while (1==1)
     {
         gw->processRadioMessage();
-        if (inputAvailable(fd))
+        if (inputAvailable(cl))
         {
-            int cl;
+            printf("We have input\n");
 
-            if ( (cl = accept(fd, NULL, NULL)) == -1) {
-                perror("accept error");
-                continue;
-            }
             char buf[200];
 
             int nread = recv(cl,buf,200,0);
+            // Assume cmd\n (not cmd1\ncmd2\n)
+            printf("Nread=%d\n",nread);
 
             gw->debug(PSTR("INP:%s.\n"),buf);
             gw->parseAndSend((String) buf);
+            printf("Sent to JS\n");
         }
     }
     return 0;

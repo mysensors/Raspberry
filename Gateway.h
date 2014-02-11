@@ -15,7 +15,7 @@
 #include "Relay.h"
 #ifdef RPI
 #include <sys/time.h>
-#include "PiGateway.h"
+#include "RadioGateway.h"
 #endif
 
 
