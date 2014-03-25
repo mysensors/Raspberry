@@ -30,13 +30,11 @@ all: ${GATEWAY}
 %.o: %.cpp ${DEPS}
 	${CC} -c -g -o $@ $< ${CCFLAGS} -I${RF24H}
 
-${GATEWAY}: RF24 MYSENSORS ${OBJS}
+${GATEWAY}: RF24 ${OBJS}
 	${CC} -o $@ ${OBJS} ${CCFLAGS} -I${RF24H} librf24/librf24.so.1
 
 RF24:	
 	$(MAKE) -C librf24
-MYSENSORS:
-	$(MAKE) -C ${MYSENSORSH}
 clean:
 	rm -rf $(PROGRAMS)
 
