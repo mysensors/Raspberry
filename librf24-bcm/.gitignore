@@ -1,2 +1,3 @@
 .DS_Store
 *.o
+librf24-bcm.so.1.0
