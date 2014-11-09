@@ -282,10 +282,6 @@ class MySensor : public RF24
 	char * itoa(int value, char *result, int base);
 	char * ltoa(long value, char *result, int base);
 	char * dtostrf(float f, int width, int decimals, char *result);
-	void eeprom_write_block (const void *__src, void *__dst, size_t __n);
-	void eeprom_read_block(void *__dst, const void *__src, size_t __n);
-	void eeprom_write_byte (uint8_t *__p, uint8_t __value);
-	uint8_t eeprom_read_byte (const uint8_t *__p);
 #endif
   private:
 #ifdef DEBUG
