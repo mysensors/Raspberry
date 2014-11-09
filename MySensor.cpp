@@ -13,6 +13,7 @@
 #include "MySensor.h"
 
 #ifdef __Raspberry_Pi
+	#include <PiEEPROM.h>
 	#include "RF24.h"
 	#include "RF24_config.h"
 #else
@@ -673,25 +674,6 @@ char * MySensor::dtostrf(float f, int width, int decimals, char *result)
   
     sprintf(result,format,f);
     return result;
-}
-
-// TODO: Implement this
-void MySensor::eeprom_write_block (const void *__src, void *__dst, size_t __n) {
-	printf("[EEPROM] - write block at offset: %d (%d)\n", (int)__dst, (int)__n);
-}
-
-void MySensor::eeprom_read_block(void *__dst, const void *__src, size_t __n) {
-	printf("[EEPROM] - read block at offset: %d (%d)\n", (int)__src, (int)__n);
-	memset (__dst,0,__n);
-}
-
-void MySensor::eeprom_write_byte (uint8_t *__p, uint8_t __value) {
-	printf("[EEPROM] - write byte at offset: %d value: %d\n",(int) __p, (int)__value);
-}
-
-uint8_t MySensor::eeprom_read_byte (const uint8_t *__p) {
-printf("[EEPROM] - read byte at offset: %d\n", (int)__p);
-	return 0;
 }
 
 #endif
