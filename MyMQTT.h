@@ -4,11 +4,12 @@ It handles radio network routing, relaying and ids.
 
 Created by Henrik Ekblad <henrik.ekblad@gmail.com>
 Modified by Daniel Wiegert
+ 
+06.Dez.14   Ported to Parpberry Pi by busa <busa@gmx.ch>
+ 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
 version 2 as published by the Free Software Foundation.
- 
-06.Dez.14   Ported to Parpberry Pi by busa <busa@gmx.ch>
  */
 
 #ifndef MyMQTT_h
