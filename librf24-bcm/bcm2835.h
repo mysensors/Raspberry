@@ -818,7 +818,7 @@ typedef enum
 #ifndef BCM2835_NO_DELAY_COMPATIBILITY
 #define delay(x) bcm2835_delay(x)
 #define delayMicroseconds(x) bcm2835_delayMicroseconds(x)
-#define millis() bcm2835_millis()
+#define millis(void) bcm2835_millis()
 #endif
 
 #ifdef __cplusplus
