@@ -58,13 +58,22 @@ class MyMQTT :
 public MySensor {
 
 public:
+#ifdef __Raspberry_Pi
+	MyMQTT(uint8_t _cepin, uint8_t _cspin, uint32_t spispeed,  uint8_t _inclusion_time );
+	void begin(rf24_pa_dbm_e paLevel=RF24_PA_LEVEL_GW, uint8_t channel=RF24_CHANNEL, rf24_datarate_e dataRate=RF24_DATARATE, void (*dataCallback)(char *)=NULL);
+#else
 	MyMQTT(uint8_t _cepin=5, uint8_t _cspin=6);
 	void begin(rf24_pa_dbm_e paLevel=RF24_PA_LEVEL_GW, uint8_t channel=RF24_CHANNEL, rf24_datarate_e dataRate=RF24_DATARATE, void (*dataCallback)
 			(const char *, uint8_t *)=NULL, uint8_t _rx=6, uint8_t _tx=5, uint8_t _er=4 );
+#endif
 	void processRadioMessage();
 	void processMQTTMessage(char *inputString, uint8_t inputPos);
 private:
+#ifdef __Raspberry_Pi
+	void (*dataCallback)(char *);
+#else
 	void (*dataCallback)(const char *, uint8_t *);
+#endif
 	void SendMQTT(MyMessage &msg);
 	void ledTimers();
 	void rxBlink(uint8_t cnt);
