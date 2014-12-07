@@ -369,7 +369,7 @@ void bcm2835_delay(unsigned int millis)
 }
 
 // microseconds
-void bcm2835_delayMicroseconds(uint64_t micros)
+void bcm2835_delayMicroseconds(unsigned int micros)
 {
     struct timespec t1;
     uint64_t        start;

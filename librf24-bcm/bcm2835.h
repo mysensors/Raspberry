@@ -1079,8 +1079,8 @@ extern "C" {
     /// It is reported that a delay of 0 microseconds on RaspberryPi will in fact
     /// result in a delay of about 80 microseconds. Your mileage may vary.
     /// \param[in] micros Delay in microseconds
-    extern void bcm2835_delayMicroseconds (uint64_t micros);
-
+    extern void bcm2835_delayMicroseconds (unsigned int micros);
+    
     /// Indicate the number of milliseconds since startup of PI
     /// This function is like the Arduino millis function
     /// \return Number of milliseconds
