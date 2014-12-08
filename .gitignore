@@ -11,3 +11,6 @@
 ./PiGateway
 ./PiGatewayMosquitto
 ./PiGatewaySerial
+*.cproject
+*.settings/language.settings.xml
+*.project
