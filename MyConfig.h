@@ -39,6 +39,9 @@
 	#define PSTR(x) (x)
 	#define printf_P printf
 	#define strlen_P strlen
+	#define strcpy_P strcpy
+	#define strcmp_P strcmp
+	#define PROGMEM
 #endif
 
 #endif

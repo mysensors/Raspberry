@@ -18,6 +18,7 @@ using namespace std;
 
 #ifndef __Raspberry_Pi
 	#include "utility/MsTimer2.h"
+#endif
 
 char V_0[] PROGMEM = "TEMP";		//V_TEMP
 char V_1[] PROGMEM = "HUM";		//V_HUM
@@ -85,100 +86,16 @@ char V_62[] PROGMEM = "SKETCH_VERSION"; //Custom for MQTTGateway
 char V_63[] PROGMEM = "UNKNOWN"; 	//Custom for MQTTGateway
 
 PROGMEM const char *vType[] = {
-    V_0, V_1, V_2, V_3, V_4, V_5, V_6, V_7, V_8, V_9, V_10,
-    V_11, V_12, V_13, V_14, V_15, V_16, V_17, V_18, V_19, V_20,
-    V_21, V_22, V_23, V_24, V_25, V_26, V_27, V_28, V_29, V_30,
-    V_31, V_32, V_33, V_34, V_35, V_36, V_37, V_38, V_39, V_40,
-    V_41, V_42, V_43, V_44, V_45, V_46, V_47, V_48, V_49, V_50,
-    V_51, V_52, V_53, V_54, V_55, V_56, V_57, V_58, V_59, V_60,
-    V_61, V_62, V_63
+	V_0, V_1, V_2, V_3, V_4, V_5, V_6, V_7, V_8, V_9, V_10,
+	V_11, V_12, V_13, V_14, V_15, V_16, V_17, V_18, V_19, V_20,
+	V_21, V_22, V_23, V_24, V_25, V_26, V_27, V_28, V_29, V_30,
+	V_31, V_32, V_33, V_34, V_35, V_36, V_37, V_38, V_39, V_40,
+	V_41, V_42, V_43, V_44, V_45, V_46, V_47, V_48, V_49, V_50,
+	V_51, V_52, V_53, V_54, V_55, V_56, V_57, V_58, V_59, V_60,
+	V_61, V_62, V_63
 };
-
 
 char broker[] PROGMEM = MQTT_BROKER_PREFIX;
-
-#endif
-
-#ifdef __Raspberry_Pi
-
-char V_0[]  = "TEMP";            //V_TEMP
-char V_1[]  = "HUM";             //V_HUM
-char V_2[]  = "LIGHT";           //V_LIGHT
-char V_3[]  = "DIMMER";          //V_DIMMER
-char V_4[]  = "PRESSURE";        //V_PRESSURE
-char V_5[]  = "FORECAST";        //V_FORECAST
-char V_6[]  = "RAIN";            //V_RAIN
-char V_7[]  = "RAINRATE";        //V_RAINRATE
-char V_8[]  = "WIND";            //V_WIND
-char V_9[]  = "GUST";            //V_GUST
-char V_10[]  = "DIRECTON";       //V_DIRECTON
-char V_11[]  = "UV";             //V_UV
-char V_12[]  = "WEIGHT";         //V_WEIGHT
-char V_13[]  = "DISTANCE";       //V_DISTANCE
-char V_14[]  = "IMPEDANCE";      //V_IMPEDANCE
-char V_15[]  = "ARMED";          //V_ARMED
-char V_16[]  = "TRIPPED";        //V_TRIPPED
-char V_17[]  = "WATT";           //V_WATT
-char V_18[]  = "KWH";            //V_KWH
-char V_19[]  = "SCENE_ON";       //V_SCENE_ON
-char V_20[]  = "SCENE_OFF";      //V_SCENE_OFF
-char V_21[]  = "HEATER";         //V_HEATER
-char V_22[]  = "HEATER_SW";      //V_HEATER_SW
-char V_23[]  = "LIGHT_LEVEL";    //V_LIGHT_LEVEL
-char V_24[]  = "VAR1";           //V_VAR1
-char V_25[]  = "VAR2";           //V_VAR2
-char V_26[]  = "VAR3";           //V_VAR3
-char V_27[]  = "VAR4";           //V_VAR4
-char V_28[]  = "VAR5";           //V_VAR5
-char V_29[]  = "UP";             //V_UP
-char V_30[]  = "DOWN";           //V_DOWN
-char V_31[]  = "STOP";           //V_STOP
-char V_32[]  = "IR_SEND";        //V_IR_SEND
-char V_33[]  = "IR_RECEIVE";     //V_IR_RECEIVE
-char V_34[]  = "FLOW";           //V_FLOW
-char V_35[]  = "VOLUME";         //V_VOLUME
-char V_36[]  = "LOCK_STATUS";    //V_LOCK_STATUS
-char V_37[]  = "DUST_LEVEL";     //V_DUST_LEVEL
-char V_38[]  = "VOLTAGE";        //V_VOLTAGE
-char V_39[]  = "CURRENT";        //V_CURRENT
-char V_40[]  = "";               //
-char V_41[]  = "";               //
-char V_42[]  = "";               //
-char V_43[]  = "";               //
-char V_44[]  = "";               //
-char V_45[]  = "";               //
-char V_46[]  = "";               //
-char V_47[]  = "";               //
-char V_48[]  = "";               //
-char V_49[]  = "";               //
-char V_50[]  = "";               //
-char V_51[]  = "";               //
-char V_52[]  = "";               //
-char V_53[]  = "";               //
-char V_54[]  = "";               //
-char V_55[]  = "";               //
-char V_56[]  = "";               //
-char V_57[]  = "";               //
-char V_58[]  = "";               //
-char V_59[]  = "";               //
-char V_60[]  = "Started!\n";     //Custom for MQTTGateway
-char V_61[]  = "SKETCH_NAME";    //Custom for MQTTGateway
-char V_62[]  = "SKETCH_VERSION"; //Custom for MQTTGateway
-char V_63[]  = "UNKNOWN";        //Custom for MQTTGateway
-
-const char *vType[] = {
-        V_0, V_1, V_2, V_3, V_4, V_5, V_6, V_7, V_8, V_9, V_10,
-        V_11, V_12, V_13, V_14, V_15, V_16, V_17, V_18, V_19, V_20,
-        V_21, V_22, V_23, V_24, V_25, V_26, V_27, V_28, V_29, V_30,
-        V_31, V_32, V_33, V_34, V_35, V_36, V_37, V_38, V_39, V_40,
-        V_41, V_42, V_43, V_44, V_45, V_46, V_47, V_48, V_49, V_50,
-        V_51, V_52, V_53, V_54, V_55, V_56, V_57, V_58, V_59, V_60,
-        V_61, V_62, V_63
-};
-
-char broker[] = MQTT_BROKER_PREFIX;
-
-#endif
 
 //////////////////////////////////////////////////////////////////
 
@@ -340,15 +257,10 @@ void MyMQTT::processMQTTMessage(char *inputString, uint8_t inputPos) {
 		// TODO: Check if we should send ack or not.
 		for (str = strtok_r(buffer,"/",&p) ; str && i<4 ; str = strtok_r(NULL,"/",&p)) {
 			if (i == 0) {
-#ifndef __Raspberry_Pi
-				if (strcmp_P(str,broker)!=0) {	//look for MQTT_BROKER_PREFIX
-					return;			//Message not for us or malformatted!
-				}
-#else
-                if (strcmp(str,broker)!=0) {  //look for MQTT_BROKER_PREFIX
-                    return;                 //Message not for us or malformatted!
-                }
-#endif
+		
+			if (strcmp_P(str,broker)!=0) {	//look for MQTT_BROKER_PREFIX
+				return;			//Message not for us or malformatted!
+			}
 			} else if (i==1) {
 				msg.destination = atoi(str);	//NodeID
 			} else if (i==2) {
@@ -357,11 +269,7 @@ void MyMQTT::processMQTTMessage(char *inputString, uint8_t inputPos) {
 				char match=0;			//SensorType
 				//strcpy(str,(char*)&str[2]);  //Strip V_
 
-#ifndef __Raspberry_Pi
 				for (uint8_t j=0; strcpy_P(convBuf, (char*)pgm_read_word(&(vType[j]))) ; j++) {
-#else
-				for (uint8_t j=0; strcpy(convBuf, (char*)pgm_read_word(&(vType[j]))) ; j++) {
-#endif
 					if (strcmp((char*)&str[2],convBuf)==0) { //Strip V_ and compare
 						match=j;
 						break;
@@ -429,13 +337,8 @@ void MyMQTT::SendMQTT(MyMessage &msg) {
 			buffer[buffsize++] = 0x00;		// 2: Length MSB (Remaing length can never exceed ff,so MSB must be 0!)
 			buffer[buffsize++] = 0x08;		// 3: Length LSB (ADDR), We'll set this later
 			if (msg.type > V_TOTAL) msg.type=V_TOTAL;// If type > defined types set to unknown.
-#ifndef __Raspberry_Pi
 			strcpy_P(buffer+4, broker);
 			buffsize+=strlen_P(broker);
-#else
-			strcpy(buffer+4, broker);
-			buffsize+=strlen(broker);
-#endif
 			buffsize+=sprintf(&buffer[buffsize],"/%i/%i/V_%s",msg.sender,msg.sensor,getType(convBuf, &vType[msg.type]));
 			buffer[3]=buffsize-4;			// Set correct address length on byte 4.
 
