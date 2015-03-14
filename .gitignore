@@ -1,1 +1,16 @@
 .DS_Store
+*.slo
+*.lo
+*.o
+*.obj
+*.so
+*.dylib
+*.dll
+./wiringPi/gpio/gpio
+./wiringPi/gpio/pintest
+./PiGateway
+./PiGatewayMosquitto
+./PiGatewaySerial
+*.cproject
+*.settings/language.settings.xml
+*.project
