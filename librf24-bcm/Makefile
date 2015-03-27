@@ -13,6 +13,9 @@
 #
 PREFIX=/usr/local
 
+IOBASE := $(shell cat /proc/iomem | grep bcm2708_vcio | cut -f 1 -d "-")
+PIREV := $(shell cat /proc/cpuinfo | grep Revision | cut -f 2 -d ":" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$$//')
+
 # Library parameters
 # where to put the lib
 LIBDIR=$(PREFIX)/lib
@@ -25,7 +28,13 @@ LIBNAME=$(LIB).so.1.0
 HEADER_DIR=${PREFIX}/include/RF24
 
 # The recommended compiler flags for the Raspberry Pi
-CCFLAGS=-Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s
+CCFLAGS=-Ofast -mfpu=vfp -mfloat-abi=hard -mtune=arm1176jzf-s
+ifeq (${PIREV},$(filter ${PIREV},a01041 a21041))
+	CCFLAGS += -march=armv7-a
+else
+	CCFLAGS += -march=armv6zk
+endif
+CCFLAGS += -D BCM2835_PERI_BASE=0x${IOBASE}
 
 # make all
 # reinstall the library after each recompilation

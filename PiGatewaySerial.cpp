@@ -99,7 +99,11 @@ int main(int argc, char **argv)
 	signal(SIGINT, handle_sigint);
 
 	/* create MySensors Gateway object */
+#ifdef __PI_BPLUS
+	gw = new MyGateway(RPI_BPLUS_GPIO_J8_15, RPI_BPLUS_GPIO_J8_24, BCM2835_SPI_SPEED_8MHZ, 60);
+#else
 	gw = new MyGateway(RPI_V2_GPIO_P1_22, BCM2835_SPI_CS0, BCM2835_SPI_SPEED_8MHZ, 60);
+#endif	
 	if (gw == NULL)
 	{
 		printf("Could not create MyGateway! (%d) %s\n", errno, strerror(errno));
