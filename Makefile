@@ -1,5 +1,11 @@
 CC=g++
-CCFLAGS=-Wall -Ofast -mfpu=vfp -lpthread -g -D__Raspberry_Pi -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s
+PIREV := $(shell cat /proc/cpuinfo | grep Revision | cut -f 2 -d ":" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$$//')
+CCFLAGS=-Wall -Ofast -mfpu=vfp -lpthread -g -D__Raspberry_Pi -mfloat-abi=hard -mtune=arm1176jzf-s
+ifeq (${PIREV},a01041)
+	CCFLAGS += -march=armv7-a -D__PI_2
+else
+	CCFLAGS += -march=armv6zk
+endif
 
 # define all programs
 PROGRAMS = MyGateway MySensor MyMessage PiEEPROM
@@ -34,5 +40,5 @@ ${GATEWAY_SERIAL}: ${OBJS} ${GATEWAY_SERIAL_OBJS}
 	${CC} -o $@ ${OBJS} ${GATEWAY_SERIAL_OBJS} ${CCFLAGS} ${CINCLUDE} -lrf24-bcm -lutil
 
 clean:
-	rm -rf $(PROGRAMS) $(GATEWAY) $(GATEWAY_SERIAL) $(BUILDDIR)/${OBJS}
+	rm -rf $(PROGRAMS) $(GATEWAY) $(GATEWAY_SERIAL) ${OBJS} $(GATEWAY_OBJS) $(GATEWAY_SERIAL_OBJS)
 
