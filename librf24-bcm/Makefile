@@ -29,7 +29,7 @@ HEADER_DIR=${PREFIX}/include/RF24
 
 # The recommended compiler flags for the Raspberry Pi
 CCFLAGS=-Ofast -mfpu=vfp -mfloat-abi=hard -mtune=arm1176jzf-s
-ifeq (${PIREV},a01041)
+ifeq (${PIREV},$(filter ${PIREV},a01041 a21041))
 	CCFLAGS += -march=armv7-a
 else
 	CCFLAGS += -march=armv6zk
