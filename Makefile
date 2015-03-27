@@ -1,11 +1,20 @@
 CC=g++
+# get PI Revision from cpuinfo
 PIREV := $(shell cat /proc/cpuinfo | grep Revision | cut -f 2 -d ":" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$$//')
 CCFLAGS=-Wall -Ofast -mfpu=vfp -lpthread -g -D__Raspberry_Pi -mfloat-abi=hard -mtune=arm1176jzf-s
-ifeq (${PIREV},a01041)
-	CCFLAGS += -march=armv7-a -D__PI_2
+
+ifeq (${PIREV},$(filter ${PIREV},a01041 a21041))
+	# a01041 and a21041 are PI 2 Model B and armv7
+	CCFLAGS += -march=armv7-a 
 else
+	# anything else is armv6
 	CCFLAGS += -march=armv6zk
 endif
+
+ifeq (${PIREV},$(filter ${PIREV},a01041 a21041 0010))
+	# a01041 and a21041 are PI 2 Model B with BPLUS Layout and 0010 is Pi Model B+ with BPLUS Layout
+	CCFLAGS += -D__PI_BPLUS
+endif 
 
 # define all programs
 PROGRAMS = MyGateway MySensor MyMessage PiEEPROM
