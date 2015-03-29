@@ -30,6 +30,7 @@
 #include <pwd.h>
 #include <grp.h>
 #include <fcntl.h>
+#include <syslog.h>
 
 #include <RF24.h>
 #include <MyGateway.h>
@@ -55,15 +56,46 @@ static const char *serial_tty = _TTY_NAME;
 static const char *devGroupName = _TTY_GROUPNAME;
 
 int daemonizeFlag = 0;
+
+void openSyslog()
+{
+    setlogmask(LOG_UPTO (LOG_INFO));
+    openlog(NULL, 0, LOG_USER);
+}
+
+void closeSyslog()
+{
+    closelog();
+}
+
+void log(int priority, const char *format, ...)
+{
+	va_list argptr;
+    va_start(argptr, format);
+    if (daemonizeFlag == 1) {
+		vsyslog(priority, format, argptr);
+	} else {
+		vprintf(format, argptr);
+	}
+	va_end(argptr);
+}
+
 /*
  * handler for SIGINT signal
  */
 void handle_sigint(int sig)
 {
-	printf("Received SIGINT\n");
+	log(LOG_INFO,"Received SIGINT\n");
 	running = 0;
 }
 
+void handle_sigusr1(int sig)
+{
+	log(LOG_INFO,"Received SIGUSR1\n");
+	int curLogLevel = setlogmask(0);
+	if (curLogLevel != LOG_DEBUG) setlogmask(LOG_UPTO (LOG_DEBUG));
+	else setlogmask(LOG_UPTO (LOG_INFO));
+}
 
 /*
  * callback function writting data from RF24 module to the PTY
@@ -74,7 +106,7 @@ void write_msg_to_pty(char *msg)
 
 	if (msg == NULL)
 	{
-		printf("[callback] NULL msg received!\n");
+		log(LOG_WARNING,"[callback] NULL msg received!\n");
 		return;
 	}
 	
@@ -154,14 +186,15 @@ int main(int argc, char **argv)
         		break;
         }
     }
-	
-	printf("Starting PiGatewaySerial...\n");
-	printf("Protocol version - %s\n", LIBRARY_VERSION);
+	openSyslog();
+	log(LOG_INFO,"Starting PiGatewaySerial...\n");
+	log(LOG_INFO,"Protocol version - %s\n", LIBRARY_VERSION);
 
 	/* register the signal handler */
 	signal(SIGINT, handle_sigint);
 	signal(SIGTERM, handle_sigint);
-
+	signal(SIGUSR1, handle_sigusr1);
+	
 	/* create MySensors Gateway object */
 #ifdef __PI_BPLUS
 	gw = new MyGateway(RPI_BPLUS_GPIO_J8_15, RPI_BPLUS_GPIO_J8_24, BCM2835_SPI_SPEED_8MHZ, 60);
@@ -170,7 +203,7 @@ int main(int argc, char **argv)
 #endif	
 	if (gw == NULL)
 	{
-		printf("Could not create MyGateway! (%d) %s\n", errno, strerror(errno));
+		log(LOG_ERR,"Could not create MyGateway! (%d) %s\n", errno, strerror(errno));
 		status = EXIT_FAILURE;
 		goto cleanup;
 	}
@@ -179,7 +212,7 @@ int main(int argc, char **argv)
 	ret = openpty(&pty_master, &pty_slave, NULL, NULL, NULL);
 	if (ret != 0) 
 	{
-		printf("Could not create a PTY! (%d) %s\n", errno, strerror(errno));
+		log(LOG_ERR,"Could not create a PTY! (%d) %s\n", errno, strerror(errno));
 		status = EXIT_FAILURE;
 		goto cleanup;
 	}
@@ -187,36 +220,36 @@ int main(int argc, char **argv)
 	devGrp = getgrnam(devGroupName);
 	if(devGrp == NULL) 
 	{
-       printf("getgrnam: %s failed. (%d) %s\n", devGroupName, errno, strerror(errno));
+       log(LOG_ERR,"getgrnam: %s failed. (%d) %s\n", devGroupName, errno, strerror(errno));
        status = EXIT_FAILURE;
        goto cleanup;
     }
     ret = chown(ttyname(pty_slave),-1,devGrp->gr_gid);
     if (ret == -1) 
     {
-    	printf("chown failed. (%d) %s\n", errno, strerror(errno));
+    	log(LOG_ERR,"chown failed. (%d) %s\n", errno, strerror(errno));
     	status = EXIT_FAILURE;
     	goto cleanup;
     }
 	ret = chmod(ttyname(pty_slave),ttyPermissions);
 	if (ret != 0) 
 	{
-		printf("Could not change PTY permissions! (%d) %s\n", errno, strerror(errno));
+		log(LOG_ERR,"Could not change PTY permissions! (%d) %s\n", errno, strerror(errno));
 		status = EXIT_FAILURE;
 		goto cleanup;
 	}
-	printf("Created PTY '%s'\n", ttyname(pty_slave));
+	log(LOG_INFO,"Created PTY '%s'\n", ttyname(pty_slave));
 	
 	/* create a symlink with predictable name to the PTY device */
 	unlink(serial_tty);	// remove the symlink if it already exists
 	ret = symlink(ttyname(pty_slave), serial_tty);
 	if (ret != 0)
 	{
-		printf("Could not create a symlink '%s' to PTY! (%d) %s\n", serial_tty, errno, strerror(errno));
+		log(LOG_ERR,"Could not create a symlink '%s' to PTY! (%d) %s\n", serial_tty, errno, strerror(errno));
     	status = EXIT_FAILURE;
         goto cleanup;
 	}
-	printf("Gateway tty: %s\n", serial_tty);
+	log(LOG_INFO,"Gateway tty: %s\n", serial_tty);
 
 	close(pty_slave);
 	configure_master_fd(pty_master);
@@ -237,7 +270,7 @@ int main(int argc, char **argv)
 		ret = poll(&fds, 1, 500);
 		if (ret == -1)
 		{
-			printf("poll() error (%d) %s\n", errno, strerror(errno));
+			log(LOG_ERR,"poll() error (%d) %s\n", errno, strerror(errno));
 		}
 		else if (ret == 0)
 		{
@@ -255,7 +288,7 @@ int main(int argc, char **argv)
 				size = read(pty_master, buff, sizeof(buff));
 				if (size < 0)
 				{
-					printf("read error (%d) %s\n", errno, strerror(errno));
+					log(LOG_ERR,"read error (%d) %s\n", errno, strerror(errno));
 					continue;
 				}
 				buff[size] = '\0';
@@ -267,9 +300,10 @@ int main(int argc, char **argv)
 
 
 cleanup:
-	printf("Exiting...\n");
+	log(LOG_INFO,"Exiting...\n");
 	if (gw)
 		delete(gw);
 	(void) unlink(serial_tty);
+	closeSyslog();
 	return status;
 }
