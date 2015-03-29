@@ -29,6 +29,7 @@
 #include <sys/stat.h>
 #include <pwd.h>
 #include <grp.h>
+#include <fcntl.h>
 
 #include <RF24.h>
 #include <MyGateway.h>
@@ -52,6 +53,8 @@ int pty_slave = -1;
 static const mode_t ttyPermissions = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
 static const char *serial_tty = _TTY_NAME;
 static const char *devGroupName = _TTY_GROUPNAME;
+
+int daemonizeFlag = 0;
 /*
  * handler for SIGINT signal
  */
@@ -93,6 +96,42 @@ void configure_master_fd(int fd)
 	tcsetattr(fd, 0, &settings);
 }
 
+static void daemonize(void)  
+{  
+    pid_t pid, sid;  
+    int fd;   
+  
+    // already a daemon
+    if ( getppid() == 1 ) return;  
+  
+    // Fork off the parent process  
+    pid = fork();  
+    if (pid < 0)  exit(EXIT_FAILURE);  // fork() failed 
+    if (pid > 0)  exit(EXIT_SUCCESS);  // fork() successful, this is the parent process, kill it
+  	      
+  	// From here on it is child only
+      
+    // Create a new SID for the child process
+    sid = setsid();  
+    if (sid < 0) exit(EXIT_FAILURE);  // Not logging as nobody can see it.
+  
+    // Change the current working directory. 
+    if ((chdir("/")) < 0) exit(EXIT_FAILURE);   
+  	
+  	// Divert the standard file desciptors to /dev/null
+    fd = open("/dev/null",O_RDWR, 0);  
+  	if (fd != -1)  
+    {  
+        dup2 (fd, STDIN_FILENO);  
+        dup2 (fd, STDOUT_FILENO);  
+        dup2 (fd, STDERR_FILENO);  
+  
+        if (fd > 2) close (fd);
+    }  
+  
+    // reset File Creation Mask 
+    umask(027);  
+}  
 
 /*
  * Main gateway logic
@@ -104,8 +143,18 @@ int main(int argc, char **argv)
 	
 	MyGateway *gw = NULL;
 	int status = EXIT_SUCCESS;
-	int ret;
-
+	int ret, c;
+	
+	while ((c = getopt (argc, argv, "d")) != -1) 
+	{
+    	switch (c)
+      	{
+      		case 'd':
+        		daemonizeFlag = 1;
+        		break;
+        }
+    }
+	
 	printf("Starting PiGatewaySerial...\n");
 	printf("Protocol version - %s\n", LIBRARY_VERSION);
 
@@ -174,7 +223,7 @@ int main(int argc, char **argv)
 
 	fds.events = POLLRDNORM;
 	fds.fd = pty_master;
-
+	if (daemonizeFlag) daemonize();
 	/* we are ready, initialize the Gateway */
 	gw->begin(RF24_PA_LEVEL_GW, RF24_CHANNEL, RF24_DATARATE, &write_msg_to_pty);
 

@@ -4,7 +4,7 @@
 # Set the name of predictable tty
 TTY_NAME := /dev/ttyMySensorsGateway
 # Set the group name for the raw tty
-TTY_GROUPNAME := tty
+TTY_GROUPNAME := dialout
 ##########################################################################
 # Please do not change anything below this line                          #
 ##########################################################################
