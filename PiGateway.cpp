@@ -15,6 +15,11 @@
 
 MyGateway *gw;
 
+void log(int priority, const char *format, ...)
+{
+	// dummy to make it compile correctly, needs to be changed later
+}
+
 void msgCallback(char *msg){
 	printf("[CALLBACK]%s", msg);
 

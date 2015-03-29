@@ -93,7 +93,7 @@ void handle_sigusr1(int sig)
 {
 	log(LOG_INFO,"Received SIGUSR1\n");
 	int curLogLevel = setlogmask(0);
-	if (curLogLevel != LOG_DEBUG) setlogmask(LOG_UPTO (LOG_DEBUG));
+	if (curLogLevel != LOG_UPTO(LOG_DEBUG)) setlogmask(LOG_UPTO (LOG_DEBUG));
 	else setlogmask(LOG_UPTO (LOG_INFO));
 }
 
