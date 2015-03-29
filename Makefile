@@ -1,10 +1,14 @@
 ##########################################################################
 # Configurable options                                                   #
 ##########################################################################
+# Install Base location
+PREFIX=/usr/local
+# Bin Dir
+BINDIR=$(PREFIX)/sbin
 # Set the name of predictable tty
 TTY_NAME := /dev/ttyMySensorsGateway
 # Set the group name for the raw tty
-TTY_GROUPNAME := dialout
+TTY_GROUPNAME := tty
 ##########################################################################
 # Please do not change anything below this line                          #
 ##########################################################################
@@ -61,3 +65,42 @@ ${GATEWAY_SERIAL}: ${OBJS} ${GATEWAY_SERIAL_OBJS}
 clean:
 	rm -rf $(PROGRAMS) $(GATEWAY) $(GATEWAY_SERIAL) ${OBJS} $(GATEWAY_OBJS) $(GATEWAY_SERIAL_OBJS)
 
+install: all install-gatewayserial install-gateway install-initscripts
+
+install-gatewayserial: 
+	@echo "Installing ${GATEWAY_SERIAL} to ${BINDIR}"
+	@install -m 0755 ${GATEWAY_SERIAL} ${BINDIR}
+
+install-gateway: 
+	@echo "Installing ${GATEWAY} to ${BINDIR}"
+	@install -m 0755 ${GATEWAY} ${BINDIR}
+	
+install-initscripts:
+	@echo "Installing initscripts to /etc/init.d"
+	@install -m 0755 initscripts/PiGatewaySerial /etc/init.d
+	@install -m 0755 initscripts/PiGateway /etc/init.d
+	@echo "Installing syslog config to /etc/rsyslog.d"
+	@install -m 0755 initscripts/30-PiGatewaySerial.conf /etc/rsyslog.d
+	@install -m 0755 initscripts/30-PiGateway.conf  /etc/rsyslog.d
+	@service rsyslog restart
+
+enable-gw: install
+	@update-rc.d PiGateway defaults
+	
+enable-gwserial: install
+	@update-rc.d PiGatewaySerial defaults
+	
+remove-gw:
+	@update-rc.d -f PiGateway remove
+	
+remove-gwserial:
+	@update-rc.d -f PiGatewaySerial remove
+	
+uninstall: remove-gw remove-gwserial
+	@echo "Stopping daemon PiGatewaySerial (ignore errors)"
+	-@service PiGatewaySerial stop
+	@echo "Stopping daemon PiGateway (ignore errors)"
+	-@service PiGateway stop
+	@echo "removing files"
+	rm ${BINDIR}/PiGatewaySerial ${BINDIR}/PiGateway /etc/init.d/PiGatewaySerial /etc/init.d/PiGateway /etc/rsyslog.d/30-PiGatewaySerial.conf /etc/rsyslog.d/30-PiGateway.conf
+	
