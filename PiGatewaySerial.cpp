@@ -99,6 +99,7 @@ int main(int argc, char **argv)
 
 	/* register the signal handler */
 	signal(SIGINT, handle_sigint);
+	signal(SIGTERM, handle_sigint);
 
 	/* create MySensors Gateway object */
 #ifdef __PI_BPLUS
