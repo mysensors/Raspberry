@@ -1,7 +1,17 @@
+##########################################################################
+# Configurable options                                                   #
+##########################################################################
+# Set the name of predictable tty
+TTY_NAME := /dev/ttyMySensorsGateway
+# Set the group name for the raw tty
+TTY_GROUPNAME := tty
+##########################################################################
+# Please do not change anything below this line                          #
+##########################################################################
 CC=g++
 # get PI Revision from cpuinfo
 PIREV := $(shell cat /proc/cpuinfo | grep Revision | cut -f 2 -d ":" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$$//')
-CCFLAGS=-Wall -Ofast -mfpu=vfp -lpthread -g -D__Raspberry_Pi -mfloat-abi=hard -mtune=arm1176jzf-s
+CCFLAGS=-Wall -Ofast -mfpu=vfp -lpthread -g -D__Raspberry_Pi -mfloat-abi=hard -mtune=arm1176jzf-s -D_TTY_NAME=\"${TTY_NAME}\" -D_TTY_GROUPNAME=\"${TTY_GROUPNAME}\"
 
 ifeq (${PIREV},$(filter ${PIREV},a01041 a21041))
 	# a01041 and a21041 are PI 2 Model B and armv7

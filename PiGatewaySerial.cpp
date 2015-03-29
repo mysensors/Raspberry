@@ -27,10 +27,20 @@
 #include <termios.h>
 #include <poll.h>
 #include <sys/stat.h>
+#include <pwd.h>
+#include <grp.h>
 
 #include <RF24.h>
 #include <MyGateway.h>
 #include <Version.h>
+
+#ifndef _TTY_NAME
+	#define _TTY_NAME "/dev/ttyMySensorsGateway"
+#endif
+
+#ifndef _TTY_GROUPNAME
+	#define _TTY_GROUPNAME "tty"
+#endif
 
 /* variable indicating if the server is still running */
 volatile static int running = 1;
@@ -40,8 +50,8 @@ int pty_master = -1;
 int pty_slave = -1;
 
 static const mode_t ttyPermissions = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
-static const char *serial_tty = "/dev/ttyMySensorsGateway";
-
+static const char *serial_tty = _TTY_NAME;
+static const char *devGroupName = _TTY_GROUPNAME;
 /*
  * handler for SIGINT signal
  */
@@ -90,6 +100,8 @@ void configure_master_fd(int fd)
 int main(int argc, char **argv)
 {
 	struct pollfd fds;
+	struct group* devGrp;
+	
 	MyGateway *gw = NULL;
 	int status = EXIT_SUCCESS;
 	int ret;
@@ -122,6 +134,21 @@ int main(int argc, char **argv)
 		status = EXIT_FAILURE;
 		goto cleanup;
 	}
+	errno = 0;
+	devGrp = getgrnam(devGroupName);
+	if(devGrp == NULL) 
+	{
+       printf("getgrnam: %s failed. (%d) %s\n", devGroupName, errno, strerror(errno));
+       status = EXIT_FAILURE;
+       goto cleanup;
+    }
+    ret = chown(ttyname(pty_slave),-1,devGrp->gr_gid);
+    if (ret == -1) 
+    {
+    	printf("chown failed. (%d) %s\n", errno, strerror(errno));
+    	status = EXIT_FAILURE;
+    	goto cleanup;
+    }
 	ret = chmod(ttyname(pty_slave),ttyPermissions);
 	if (ret != 0) 
 	{
