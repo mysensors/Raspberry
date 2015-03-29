@@ -26,6 +26,7 @@
 #include <pty.h>
 #include <termios.h>
 #include <poll.h>
+#include <sys/stat.h>
 
 #include <RF24.h>
 #include <MyGateway.h>
@@ -38,6 +39,8 @@ volatile static int running = 1;
 int pty_master = -1;
 int pty_slave = -1;
 
+static const mode_t ttyPermissions = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
+static const char *serial_tty = "/dev/ttyMySensorsGateway";
 
 /*
  * handler for SIGINT signal
@@ -86,7 +89,6 @@ void configure_master_fd(int fd)
  */
 int main(int argc, char **argv)
 {
-	static const char *serial_tty = "/dev/ttyMySensorsGateway";
 	struct pollfd fds;
 	MyGateway *gw = NULL;
 	int status = EXIT_SUCCESS;
@@ -113,9 +115,16 @@ int main(int argc, char **argv)
 
 	/* create PTY - Pseudo TTY device */
 	ret = openpty(&pty_master, &pty_slave, NULL, NULL, NULL);
-	if (ret != 0)
+	if (ret != 0) 
 	{
 		printf("Could not create a PTY! (%d) %s\n", errno, strerror(errno));
+		status = EXIT_FAILURE;
+		goto cleanup;
+	}
+	ret = chmod(ttyname(pty_slave),ttyPermissions);
+	if (ret != 0) 
+	{
+		printf("Could not change PTY permissions! (%d) %s\n", errno, strerror(errno));
 		status = EXIT_FAILURE;
 		goto cleanup;
 	}
@@ -127,8 +136,8 @@ int main(int argc, char **argv)
 	if (ret != 0)
 	{
 		printf("Could not create a symlink '%s' to PTY! (%d) %s\n", serial_tty, errno, strerror(errno));
-                status = EXIT_FAILURE;
-                goto cleanup;
+    	status = EXIT_FAILURE;
+        goto cleanup;
 	}
 	printf("Gateway tty: %s\n", serial_tty);
 
