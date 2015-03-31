@@ -44,10 +44,12 @@
 	#include <string>
 	#include <getopt.h>
 	#include <iostream>
+	#include <syslog.h>
 #endif
 
 #ifdef DEBUG
-	#define debug(x,...) debugPrint(x, ##__VA_ARGS__)
+	extern void log(int priority, const char *format, ...);
+	#define debug(x,...) log(LOG_DEBUG, x, ##__VA_ARGS__)
 #else
 	#define debug(x,...)
 #endif

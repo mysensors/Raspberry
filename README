@@ -1,0 +1,54 @@
+Wiring the NRF24
+
+Checking your Hardware Version
+
+On the shell execute 'cat /proc/cpuinfo' at the bottom of the output you will find the
+field 'Revision'. Revision values of a01041, a21041 or 0010 inidicate Hardware Version
+B+ anything else V2.
+
+Pi Hardware Version V2
+
+GND	  25
+VCC	  17
+CE	  22
+CSN   24
+SCK   23
+MOSI  19
+MISO  21
+IRQ	  --
+
+Pi Hardware Version B+
+
+GND	  25
+VCC	  17
+CE	  15
+CSN   24
+SCK   23
+MOSI  19
+MISO  21
+IRQ	  --
+
+Building Serial Gateway
+
+The standard configuration will build the Serial Gateway with a tty name of
+'/dev/ttyMySensorsGateway' and PTS group ownership of 'tty' the PTS will be group read 
+and write. The default install location will be /usr/local/sbin. If you want to change
+that edit the variables in the head of the Makefile.
+
+First build the librf24-bcm library
+
+- Change to librf24-bcm
+- make all
+- sudo make install
+
+Build the Gateway
+
+- change back to Raspberry Dir
+- make all
+- sudo make install
+- (if you want to start daemon at boot) sudo make enable-gwserial
+
+Uninstalling 
+
+- change to Raspberry Dir
+- sudo make uninstall

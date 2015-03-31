@@ -15,6 +15,31 @@
 
 MyGateway *gw;
 
+int daemonizeFlag = 0;
+
+void openSyslog()
+{
+    setlogmask(LOG_UPTO (LOG_INFO));
+    openlog(NULL, 0, LOG_USER);
+}
+
+void closeSyslog()
+{
+    closelog();
+}
+
+void log(int priority, const char *format, ...)
+{
+	va_list argptr;
+    va_start(argptr, format);
+    if (daemonizeFlag == 1) {
+		vsyslog(priority, format, argptr);
+	} else {
+		vprintf(format, argptr);
+	}
+	va_end(argptr);
+}
+
 void msgCallback(char *msg){
 	printf("[CALLBACK]%s", msg);
 
@@ -22,8 +47,8 @@ void msgCallback(char *msg){
 
 void setup(void)
 {
-	printf("Starting Gateway...\n");
-	gw = new MyGateway(RPI_V2_GPIO_P1_22, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ, 30000);
+	printf("Starting Gateway...\n"); 
+	gw = new MyGateway(RPI_V2_GPIO_P1_22, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_8MHZ, 60);
 	
 	if (gw == NULL)
     {
@@ -39,9 +64,10 @@ void loop(void)
 
 int main(int argc, char** argv) 
 {
+	openSyslog();
 	setup();
 	while(1)
 		loop();
-	
+	closeSyslog();
 	return 0;
 }

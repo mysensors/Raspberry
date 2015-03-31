@@ -279,7 +279,7 @@ boolean MySensor::process() {
 
 	if (!available || pipe>6)
 		return false;
-
+	memset(&msg,0,sizeof(MyMessage));
 	uint8_t len = RF24::getDynamicPayloadSize();
 	RF24::read(&msg, len);
 	RF24::writeAckPayload(pipe,&pipe, 1 );
