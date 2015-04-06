@@ -280,7 +280,8 @@ class MySensor : public RF24
 	boolean sendWrite(uint8_t dest, MyMessage &message, bool broadcast=false);
 
 #ifdef __Raspberry_Pi
-	long unsigned int millis();
+	unsigned long millis();
+	unsigned long millis_at_start;
 	char * itoa(int value, char *result, int base);
 	char * ltoa(long value, char *result, int base);
 	char * dtostrf(float f, int width, int decimals, char *result);
