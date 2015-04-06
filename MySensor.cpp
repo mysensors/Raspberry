@@ -37,6 +37,9 @@ inline MyMessage& build (MyMessage &msg, uint8_t sender, uint8_t destination, ui
 
 #ifdef __Raspberry_Pi
 MySensor::MySensor(uint8_t _cepin, uint8_t _cspin, uint32_t spispeed ) : RF24(_cepin, _cspin, spispeed){
+	timeval curTime;
+	gettimeofday(&curTime, NULL);
+	millis_at_start = curTime.tv_sec;
 }
 #else
 MySensor::MySensor(uint8_t _cepin, uint8_t _cspin) : RF24(_cepin, _cspin) {
@@ -597,7 +600,7 @@ unsigned long MySensor::millis()
 {
     timeval curTime;
     gettimeofday(&curTime, NULL);
-    return curTime.tv_usec / 1000;
+    return ((curTime.tv_sec - millis_at_start) * 1000) + (curTime.tv_usec / 1000);
 }
 
 /**
