@@ -142,6 +142,9 @@ typedef enum {
 #ifdef __cplusplus
 class MyMessage
 {
+private:
+	char* getCustomString(char *buffer) const;
+
 public:
 	// Constructors
 	MyMessage();
