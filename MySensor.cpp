@@ -12,6 +12,8 @@
 
 #include "MySensor.h"
 
+using namespace std;
+
 #ifdef __Raspberry_Pi
 	#include <PiEEPROM.h>
 	#include "RF24.h"
