@@ -197,7 +197,7 @@ int main(int argc, char **argv)
 	
 	/* create MySensors Gateway object */
 #ifdef __PI_BPLUS
-	gw = new MyGateway(RPI_BPLUS_GPIO_J8_15, RPI_BPLUS_GPIO_J8_24, BCM2835_SPI_SPEED_8MHZ, 1);
+	gw = new MyGateway(RPI_BPLUS_GPIO_J8_22, RPI_BPLUS_GPIO_J8_24, BCM2835_SPI_SPEED_8MHZ, 1);
 #else
 	gw = new MyGateway(RPI_V2_GPIO_P1_22, BCM2835_SPI_CS0, BCM2835_SPI_SPEED_8MHZ, 1);
 #endif	
