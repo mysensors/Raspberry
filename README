@@ -1,27 +1,8 @@
 Wiring the NRF24
 
-Checking your Hardware Version
-
-On the shell execute 'cat /proc/cpuinfo' at the bottom of the output you will find the
-field 'Revision'. Revision values of a01041, a21041 or 0010 inidicate Hardware Version
-B+ anything else V2.
-
-Pi Hardware Version V2
-
 GND	  25
 VCC	  17
 CE	  22
-CSN   24
-SCK   23
-MOSI  19
-MISO  21
-IRQ	  --
-
-Pi Hardware Version B+
-
-GND	  25
-VCC	  17
-CE	  15
 CSN   24
 SCK   23
 MOSI  19
@@ -47,6 +28,17 @@ Build the Gateway
 - make all
 - sudo make install
 - (if you want to start daemon at boot) sudo make enable-gwserial
+
+For some controllers a more recognisable name needs to be used: e.g. /dev/ttyUSB020 (check if this is free).
+
+sudo ln -s /dev/ttyMySensorsGateway /dev/ttyUSB20
+
+To automatically create the link on startup, add
+ln -s /dev/ttyMySensorsGateway /dev/ttyUSB20
+just before
+exit0
+in /etc/rc.local
+
 
 Uninstalling 
 
