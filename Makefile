@@ -47,7 +47,7 @@ GATEWAY_DEPS = ${GATEWAY:=.h}
 GATEWAY_SERIAL_DEPS = ${GATEWAY_SERIAL:=.h}
 DEPS = ${PROGRAMS:=.h}
 
-RF24H = librf24-bcm/
+RF24H = /usr/local/include/RF24
 CINCLUDE=-I. -I${RF24H}
 
 
