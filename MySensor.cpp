@@ -116,7 +116,7 @@ void MySensor::setupRadio(rf24_pa_dbm_e paLevel, uint8_t channel, rf24_datarate_
 
 	if (!RF24::isPVariant()) {
 		debug(PSTR("check wires\n"));
-		while(1);
+		throw "check wires";
 	}
 	RF24::setAutoAck(1);
 	RF24::setAutoAck(BROADCAST_PIPE,false); // Turn off auto ack for broadcast
@@ -347,7 +347,8 @@ boolean MySensor::process() {
 #ifndef __Raspberry_Pi
 					// Requires MySensors or other bootloader with watchdogs enabled
 					wdt_enable(WDTO_15MS);
-					for (;;);
+					//for (;;);
+					throw "I_REBOOT";
 #endif
 				} else if (type == I_ID_RESPONSE) {
 					if (nc.nodeId == AUTO) {
@@ -355,7 +356,8 @@ boolean MySensor::process() {
 						if (nc.nodeId == AUTO) {
 							// sensor net gateway will return max id if all sensor id are taken
 							debug(PSTR("full\n"));
-							while (1); // Wait here. Nothing else we can do...
+							//while (1); // Wait here. Nothing else we can do...
+							throw "full";
 						}
 						setupNode();
 						// Write id to EEPROM
