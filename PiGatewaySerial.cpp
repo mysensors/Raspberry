@@ -271,6 +271,7 @@ int main(int argc, char **argv)
 		if (ret == -1)
 		{
 			log(LOG_ERR,"poll() error (%d) %s\n", errno, strerror(errno));
+			sleep(10);
 		}
 		else if (ret == 0)
 		{
@@ -294,6 +295,8 @@ int main(int argc, char **argv)
 				buff[size] = '\0';
 				
 				gw->parseAndSend(buff);
+			} else {
+				sleep(60);
 			}
 		}
 	}

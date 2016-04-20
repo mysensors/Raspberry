@@ -66,8 +66,10 @@ int main(int argc, char** argv)
 {
 	openSyslog();
 	setup();
-	while(1)
+	while(1) {
 		loop();
+		sleep(1);
+	}
 	closeSyslog();
 	return 0;
 }
