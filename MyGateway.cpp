@@ -4,7 +4,7 @@
 
  Created by Henrik Ekblad <henrik.ekblad@gmail.com>
  12/10/14 - Ported to Raspberry Pi by OUJABER Mohamed <m.oujaber@gmail.com>
- 
+
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
@@ -89,7 +89,13 @@ void MyGateway::begin(rf24_pa_dbm_e paLevel, uint8_t channel, rf24_datarate_e da
 #endif
 
 	// Start up the radio library
-	setupRadio(paLevel, channel, dataRate);
+	try {
+		setupRadio(paLevel, channel, dataRate);
+	} catch (const char* msg) {
+		printf("Unable to start up the radio library. (Error: %s)\n", msg);
+		exit(EXIT_FAILURE);
+	}
+
 	RF24::openReadingPipe(WRITE_PIPE, BASE_RADIO_ID);
 	RF24::openReadingPipe(CURRENT_NODE_PIPE, BASE_RADIO_ID);
 	RF24::startListening();
@@ -237,20 +243,25 @@ void MyGateway::setInclusionMode(boolean newMode) {
 }
 
 void MyGateway::processRadioMessage() {
-	if (process()) {
-	  // A new message was received from one of the sensors
-	  MyMessage message = getLastMessage();
-	  if (mGetCommand(message) == C_PRESENTATION && inclusionMode) {
-		rxBlink(3);
-	  } else {
-		rxBlink(1);
-	  }
-	  // Pass along the message from sensors to serial line
-	  serial(message);
-	}
+  try {
+    if (process()) {
+      // A new message was received from one of the sensors
+      MyMessage message = getLastMessage();
+      if (mGetCommand(message) == C_PRESENTATION && inclusionMode) {
+        rxBlink(3);
+      } else {
+        rxBlink(1);
+      }
+      // Pass along the message from sensors to serial line
+      serial(message);
+    }
+  } catch (const char* msg) {
+    printf("Unable to process radio messages. (Error: %s)\n", msg);
+    exit(EXIT_FAILURE);
+  }
 
-	checkButtonTriggeredInclusion();
-	checkInclusionFinished();
+  checkButtonTriggeredInclusion();
+  checkInclusionFinished();
 }
 
 void MyGateway::serial(const char *fmt, ... ) {
@@ -319,4 +330,3 @@ void MyGateway::errBlink(uint8_t cnt) {
   if(countErr == 255) { countErr = cnt; }
 #endif
 }
-
