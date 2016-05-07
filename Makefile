@@ -15,18 +15,22 @@ TTY_GROUPNAME := tty
 CC=g++
 # get PI Revision from cpuinfo
 PIREV := $(shell cat /proc/cpuinfo | grep Revision | cut -f 2 -d ":" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$$//')
-CCFLAGS=-Wall -Ofast -mfpu=vfp -lpthread -g -D__Raspberry_Pi -mfloat-abi=hard -mtune=arm1176jzf-s -D_TTY_NAME=\"${TTY_NAME}\" -D_TTY_GROUPNAME=\"${TTY_GROUPNAME}\"
+CCFLAGS=-Wall -Ofast -lpthread -g -D__Raspberry_Pi -mfloat-abi=hard -D_TTY_NAME=\"${TTY_NAME}\" -D_TTY_GROUPNAME=\"${TTY_GROUPNAME}\"
 
-ifeq (${PIREV},$(filter ${PIREV},a01041 a21041))
-	# a01041 and a21041 are PI 2 Model B and armv7
-	CCFLAGS += -march=armv7-a
+ifeq (${PIREV}, $(filter ${PIREV}, a02082))
+	# a02082 is PI 3 Model B (ARM Cortex A53)
+	CCFLAGS += -march=armv8-a+crc -mtune=cortex-a53 -mfpu=neon-fp-armv8
+else (${PIREV}, $(filter ${PIREV}, a01041 a21041))
+	# a01041 and a21041 are PI 2 Model B (Arm Cortex A7)
+	CCFLAGS += -march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4
 else
 	# anything else is armv6
-	CCFLAGS += -march=armv6zk
+	CCFLAGS += -march=armv6zk -mtune=arm1176jzf-s -mfpu=vfp
 endif
 
-ifeq (${PIREV},$(filter ${PIREV},a01041 a21041 0010))
+ifeq (${PIREV}, $(filter ${PIREV}, a01041 a21041 0010 a02082))
 	# a01041 and a21041 are PI 2 Model B with BPLUS Layout and 0010 is Pi Model B+ with BPLUS Layout
+	# a02082 is PI 3 Model B (ARM Cortex A53)
 	CCFLAGS += -D__PI_BPLUS
 endif
 
@@ -103,4 +107,3 @@ uninstall: remove-gw remove-gwserial
 	-@service PiGateway stop
 	@echo "removing files"
 	rm ${BINDIR}/PiGatewaySerial ${BINDIR}/PiGateway /etc/init.d/PiGatewaySerial /etc/init.d/PiGateway /etc/rsyslog.d/30-PiGatewaySerial.conf /etc/rsyslog.d/30-PiGateway.conf
-	
