@@ -20,7 +20,7 @@ CCFLAGS=-Wall -Ofast -lpthread -g -D__Raspberry_Pi -mfloat-abi=hard -D_TTY_NAME=
 ifeq (${PIREV}, $(filter ${PIREV}, a02082))
 	# a02082 is PI 3 Model B (ARM Cortex A53)
 	CCFLAGS += -march=armv8-a+crc -mtune=cortex-a53 -mfpu=neon-fp-armv8
-else ifeq (${PIREV}, $(filter ${PIREV}, a01041 a21041))
+else (${PIREV}, $(filter ${PIREV}, a01041 a21041))
 	# a01041 and a21041 are PI 2 Model B (Arm Cortex A7)
 	CCFLAGS += -march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4
 else
