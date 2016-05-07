@@ -24,14 +24,14 @@ else (${PIREV}, $(filter ${PIREV}, a01041 a21041))
   # a01041 and a21041 are PI 2 Model B (Arm Cortex A7)
   CCFLAGS += -march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4
 else
-	# anything else is armv6
-	CCFLAGS += -march=armv6zk -mtune=arm1176jzf-s -mfpu=vfp
+  # anything else is armv6
+  CCFLAGS += -march=armv6zk -mtune=arm1176jzf-s -mfpu=vfp
 endif
 
 ifeq (${PIREV}, $(filter ${PIREV}, a01041 a21041 0010 a02082))
-	# a01041 and a21041 are PI 2 Model B with BPLUS Layout and 0010 is Pi Model B+ with BPLUS Layout
-	# a02082 is PI 3 Model B (ARM Cortex A53)
-	CCFLAGS += -D__PI_BPLUS
+  # a01041 and a21041 are PI 2 Model B with BPLUS Layout and 0010 is Pi Model B+ with BPLUS Layout
+  # a02082 is PI 3 Model B (ARM Cortex A53)
+  CCFLAGS += -D__PI_BPLUS
 endif
 
 # define all programs
@@ -58,52 +58,52 @@ CINCLUDE=-I. -I${RF24H}
 all: ${GATEWAY} ${GATEWAY_SERIAL}
 
 %.o: %.cpp %.h ${DEPS}
-	${CC} -c -o $@ $< ${CCFLAGS} ${CINCLUDE}
+  ${CC} -c -o $@ $< ${CCFLAGS} ${CINCLUDE}
 
 ${GATEWAY}: ${OBJS} ${GATEWAY_OBJS}
-	${CC} -o $@ ${OBJS} ${GATEWAY_OBJS} ${CCFLAGS} ${CINCLUDE} -lrf24-bcm
+  ${CC} -o $@ ${OBJS} ${GATEWAY_OBJS} ${CCFLAGS} ${CINCLUDE} -lrf24-bcm
 
 ${GATEWAY_SERIAL}: ${OBJS} ${GATEWAY_SERIAL_OBJS}
-	${CC} -o $@ ${OBJS} ${GATEWAY_SERIAL_OBJS} ${CCFLAGS} ${CINCLUDE} -lrf24-bcm -lutil
+  ${CC} -o $@ ${OBJS} ${GATEWAY_SERIAL_OBJS} ${CCFLAGS} ${CINCLUDE} -lrf24-bcm -lutil
 
 clean:
-	rm -rf $(PROGRAMS) $(GATEWAY) $(GATEWAY_SERIAL) ${OBJS} $(GATEWAY_OBJS) $(GATEWAY_SERIAL_OBJS)
+  rm -rf $(PROGRAMS) $(GATEWAY) $(GATEWAY_SERIAL) ${OBJS} $(GATEWAY_OBJS) $(GATEWAY_SERIAL_OBJS)
 
 install: all install-gatewayserial install-gateway install-initscripts
 
 install-gatewayserial:
-	@echo "Installing ${GATEWAY_SERIAL} to ${BINDIR}"
-	@install -m 0755 ${GATEWAY_SERIAL} ${BINDIR}
+  @echo "Installing ${GATEWAY_SERIAL} to ${BINDIR}"
+  @install -m 0755 ${GATEWAY_SERIAL} ${BINDIR}
 
 install-gateway:
-	@echo "Installing ${GATEWAY} to ${BINDIR}"
-	@install -m 0755 ${GATEWAY} ${BINDIR}
+  @echo "Installing ${GATEWAY} to ${BINDIR}"
+  @install -m 0755 ${GATEWAY} ${BINDIR}
 
 install-initscripts:
-	@echo "Installing initscripts to /etc/init.d"
-	@install -m 0755 initscripts/PiGatewaySerial /etc/init.d
-	@install -m 0755 initscripts/PiGateway /etc/init.d
-	@echo "Installing syslog config to /etc/rsyslog.d"
-	@install -m 0755 initscripts/30-PiGatewaySerial.conf /etc/rsyslog.d
-	@install -m 0755 initscripts/30-PiGateway.conf  /etc/rsyslog.d
-	@service rsyslog restart
+  @echo "Installing initscripts to /etc/init.d"
+  @install -m 0755 initscripts/PiGatewaySerial /etc/init.d
+  @install -m 0755 initscripts/PiGateway /etc/init.d
+  @echo "Installing syslog config to /etc/rsyslog.d"
+  @install -m 0755 initscripts/30-PiGatewaySerial.conf /etc/rsyslog.d
+  @install -m 0755 initscripts/30-PiGateway.conf  /etc/rsyslog.d
+  @service rsyslog restart
 
 enable-gw: install
-	@update-rc.d PiGateway defaults
+  @update-rc.d PiGateway defaults
 
 enable-gwserial: install
-	@update-rc.d PiGatewaySerial defaults
+  @update-rc.d PiGatewaySerial defaults
 
 remove-gw:
-	@update-rc.d -f PiGateway remove
+  @update-rc.d -f PiGateway remove
 
 remove-gwserial:
-	@update-rc.d -f PiGatewaySerial remove
+  @update-rc.d -f PiGatewaySerial remove
 
 uninstall: remove-gw remove-gwserial
-	@echo "Stopping daemon PiGatewaySerial (ignore errors)"
-	-@service PiGatewaySerial stop
-	@echo "Stopping daemon PiGateway (ignore errors)"
-	-@service PiGateway stop
-	@echo "removing files"
-	rm ${BINDIR}/PiGatewaySerial ${BINDIR}/PiGateway /etc/init.d/PiGatewaySerial /etc/init.d/PiGateway /etc/rsyslog.d/30-PiGatewaySerial.conf /etc/rsyslog.d/30-PiGateway.conf
+  @echo "Stopping daemon PiGatewaySerial (ignore errors)"
+  -@service PiGatewaySerial stop
+  @echo "Stopping daemon PiGateway (ignore errors)"
+  -@service PiGateway stop
+  @echo "removing files"
+  rm ${BINDIR}/PiGatewaySerial ${BINDIR}/PiGateway /etc/init.d/PiGatewaySerial /etc/init.d/PiGateway /etc/rsyslog.d/30-PiGatewaySerial.conf /etc/rsyslog.d/30-PiGateway.conf
