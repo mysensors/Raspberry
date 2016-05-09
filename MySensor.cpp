@@ -4,7 +4,7 @@
 
  Created by Henrik Ekblad <henrik.ekblad@gmail.com>
  12/10/14 - Ported to Raspberry Pi by OUJABER Mohamed <m.oujaber@gmail.com>
- 
+
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
  version 2 as published by the Free Software Foundation.
@@ -101,7 +101,7 @@ void MySensor::begin(void (*_msgCallback)(const MyMessage &), uint8_t _nodeId, b
 	debug(PSTR("%s started, id %d\n"), repeaterMode?"repeater":"sensor", nc.nodeId);
 
 	// If we got an id, set this node to use it
-	if (nc.nodeId != AUTO) { 
+	if (nc.nodeId != AUTO) {
 		setupNode();
 		// Wait configuration reply.
 		wait(2000);
@@ -130,7 +130,7 @@ void MySensor::setupRadio(rf24_pa_dbm_e paLevel, uint8_t channel, rf24_datarate_
 
 	// All nodes listen to broadcast pipe (for FIND_PARENT_RESPONSE messages)
 	RF24::openReadingPipe(BROADCAST_PIPE, TO_ADDR(BROADCAST_ADDRESS));
-	
+
 	RF24::printDetails();
 }
 
@@ -538,7 +538,12 @@ void MySensor::wait(unsigned long ms) {
 		// reset watchdog
 		wdt_reset();
 #endif
-		process();
+    try {
+			process();
+		} catch (const char* msg) {
+			printf("Unable to process radio messages. (Error: %s)\n", msg);
+			exit(EXIT_FAILURE);
+		}
 	}
 }
 
@@ -702,7 +707,7 @@ char* MySensor::ltoa(long value, char* result, int base) {
 char * MySensor::dtostrf(float f, int width, int decimals, char *result)
 {
     char widths[3];
-    char decimalss[3];  
+    char decimalss[3];
     char format[100];
     itoa(width,widths,10);
     itoa(decimals,decimalss,10);
@@ -711,7 +716,7 @@ char * MySensor::dtostrf(float f, int width, int decimals, char *result)
     strcat(format,".");
     strcat(format,decimalss);
     strcat(format,"f");
-  
+
     sprintf(result,format,f);
     return result;
 }
