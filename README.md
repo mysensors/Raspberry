@@ -1,3 +1,8 @@
+DEPRECATED: See https://www.mysensors.org/build/raspberry
+========
+
+
+
 #Wiring the NRF	24L01+ radio
 
 |NRF24l01+|Rpi Header Pin|
